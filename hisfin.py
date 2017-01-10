@@ -64,7 +64,37 @@ api = ExanteApi(
 
 stocks = api.get_stocks()
 
-print(stocks)
+# structuring data
+data = {}
+for stock in stocks:
+    country = stock.get('country', None)
+    if country:
+        stock_info = {
+            stock['ticker']: stock,
+        }
+        if country in data:
+            if stock['exchange'] in data[country]:
+                data[country][stock['exchange']][stock['ticker']] = stock
+            else:
+                data[country][stock['exchange']] = {
+                    stock['ticker']: stock,
+                }
+        else:
+            data[country] = {
+                stock['exchange']: {
+                    stock['ticker']: stock,
+                },
+            }
+
+# show stats for structured data
+for country, exchanges in data.items():
+    print(country)
+    for exchange, stocks in exchanges.items():
+        print('  {0} - {1}'.format(
+            exchange,
+            len(stocks.keys()),
+        ))
+
 
 
 
